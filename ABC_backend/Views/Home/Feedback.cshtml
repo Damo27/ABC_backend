@@ -1,0 +1,23 @@
+﻿@*______________________________This view provides feedback to the user by utilising passed parameteds._____________________________
+__________________________The back button also redirects to a view dependant on where theinitial call came from____________________*@
+
+@{
+    ViewBag.Title = @ViewBag.Title;
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+<div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                @ViewBag.Message
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                <a href="@Url.Action(ViewBag.RedirectAction, ViewBag.RedirectControl)" class="btn btn-primary" style="background-color:yellowgreen;">Back</a>
+            </div>
+        </div>
+
+</div>

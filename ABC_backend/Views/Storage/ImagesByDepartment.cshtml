@@ -1,0 +1,13 @@
+﻿@*____________________________View is utilised as a partial view to repopulate the gallery when the selected department changes_________*@
+
+@model  ABC_backend.Models.ParentModel
+
+@foreach (var item in Model.Items)
+{
+<div class="gallery">
+    <label>
+        @Html.RadioButton("ImgUrl", item.ImgURL)
+        <img src="@item.ImgURL" />
+    </label>
+</div>
+}

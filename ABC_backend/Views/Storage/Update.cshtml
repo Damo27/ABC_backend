@@ -1,0 +1,191 @@
+﻿@*__________________________View accepts a parent model containing a list of items utilised for their Urls______________________
+    __________________________ to populate the gallery, and passes back an item to be updated in the table storage__________________*@
+
+@model ABC_backend.Models.ParentModel
+
+@{
+    ViewBag.Title = "AddItem";
+}
+
+<fieldset>
+    <legend>Add Item</legend>
+    <div class="form-horizontal">
+        @using (Html.BeginForm("Update", "Storage"))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.PartitionKey, "Department:", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("Departments", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.HiddenFor(model => model.Item.PartitionKey)
+                    @Html.HiddenFor(model => model.Item.RowKey)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.ItemName, "Item Name:", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.ItemName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Item.ItemName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.Description, "Description:", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.Description, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Item.Description, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.Price, "Price:", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.Price, new { htmlAttributes = new { Name = "Price", @class = "form-control" } })
+                    @Html.ValidationMessage("Price", "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <h4>Select an Image:</h4>
+                <div id="dropArea" class="gallery">
+                    Drop images to upload.
+                </div>
+                <div id="target">
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="gallery">
+                            <label>
+                                @Html.RadioButton("ImgUrl", item.ImgURL)
+                                <img src="@item.ImgURL" />
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div id="log">
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Update" class="btn btn-default" />
+                </div>
+            </div>
+        }
+    </div>
+</fieldset>
+
+@*Label styled to allow image and radiobutton to combine for selectable images, Gallery div class created, drop area div created*@
+<style>
+    #dropArea {
+        background: #b5b5b5;
+        border: black dashed 1px;
+        height: 180px;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 180px;
+        color: #fff;
+    }
+
+    .active-drop {
+        background: #77bafa !important;
+        border: solid 2px blue;
+        opacity: .5;
+        color: black !important;
+    }
+
+    label > input { /* HIDE RADIO */
+        visibility: hidden; /* Makes input not-clickable */
+        position: absolute; /* Remove input from document flow */
+    }
+
+        label > input + img { /* IMAGE STYLES */
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        label > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
+            border: 2px solid #aaf442;
+        }
+
+    div.gallery {
+        margin: 5px;
+        border: 1px solid #ccc;
+        float: left;
+        width: 180px;
+        height: 180px;
+    }
+
+        div.gallery:hover {
+            border: 1px solid #777;
+        }
+
+        div.gallery img {
+            width: 100%;
+            height: 180px;
+        }
+
+    div.desc {
+        padding: 15px;
+        text-align: center;
+    }
+</style>
+
+@*Scripts provide functionality to drop area and repopulation of target div when department combobox selection changes.*@
+@section Scripts{
+    <script src="~/Scripts/jquery.filedrop.js"></script>
+    <script type="text/javascript">
+        $(function ()
+        {
+            $('#dropArea').filedrop({
+                url: '@Url.Action("UploadImage")',
+                allowedfiletypes: ['image/jpeg', 'image/png'],
+                allowedfileextensions: ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG'],
+                paramname: 'images',
+                maxfiles: 5,
+                maxfilesize: 4,
+                dragOver: function ()
+                {
+                    $('#dropArea').addClass('active-drop');
+                },
+                dragLeave: function ()
+                {
+                    $('#dropArea').removeClass('active-drop');
+                },
+                drop: function()
+                {
+                    $('#dropArea').removeClass('active-drop');
+                },
+                afterAll: function (e)
+                {
+                    $('#dropArea').html('Image added successfully.')
+                },
+                uploadFinished: function (i, file, response, time)
+                {
+                    $("#log").ajaxError(function (event, jqxhr, settings, exception)
+                    {
+                        alert(exception);
+                    });
+
+                    var deptSelected = $("select option:selected").first().text();
+                    $.get('@Url.Action("ImagesByDepartment")', { id: deptSelected }, function (data)
+                    {
+                        $("#target").html(data);
+                    });
+                }
+            })
+        })
+
+        $(document).ready(function ()
+        {
+            $("#Departments").change(function ()
+            {
+                $("#log").ajaxError(function (event, jqxhr, settings, exception)
+                {
+                    alert(exception);
+                });
+
+                var deptSelected = $("select option:selected").first().text();
+                $.get('@Url.Action("ImagesByDepartment")',{ id: deptSelected }, function (data)
+                {
+                      $("#target").html(data);
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,27 @@
+﻿@*________________________Index Home view simply holds navigation buttons to the relevant actions__________________________________________*@
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<p class="lead" style="text-align: center">What would you like to do:</p>
+
+<div class="row">
+    <div class="col-md-3" style="text-align: center;">
+        <p><a href="@Url.Action("ListItems", "Storage")" class="btn btn-primary btn-lg" style="background-color:yellowgreen;">View Items</a></p>
+        <p>Displays a list of all items and their details. Further actions include updating and deleting specific items.</p>
+    </div>
+    <div class="col-md-3" style="text-align: center;">
+        <p><a href="@Url.Action("AddItem", "Storage")" class="btn btn-primary btn-lg" style="background-color:yellowgreen;">Add Item</a></p>
+        <p>Add a new Item to a specific Department. Also allows for adding of Images to departments.</p>
+    </div>
+    <div class="col-md-3" style="text-align: center;">
+        <p><a href="@Url.Action("CreateDepartment", "Storage")" class="btn btn-primary btn-lg" style="background-color:yellowgreen;">Create Department</a></p>
+        <p>Create a new department to assign items and images to.</p>
+    </div>
+    <div class="col-md-3" style="text-align: center;">
+        <p><a href="@Url.Action("AddRemoveImages", "Storage")" class="btn btn-primary btn-lg" style="background-color:yellowgreen;">Add & Remove Images</a></p>
+        <p>Add and remove images from departments.</p>
+    </div>
+</div>
